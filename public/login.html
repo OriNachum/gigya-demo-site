@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Vikis Sweets Shop</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <script id="gigya-sdk-script" src=""></script>
+</head>
+<body>
+    <header>
+        <h1>Vikis Sweets Shop</h1>
+    </header>
+    <div class="container">
+        <h2>Login or Register</h2>
+        <div id="loginContainer">
+            <p>Loading login options...</p>
+        </div>
+    </div>
+    <script>
+        const clientLoginConfig = {
+            RP_SITE_API_KEY: process.env.RP_SITE_API_KEY || '',
+            OP_PROVIDER_NAME: 'opopop'
+        };
+        async function fetchClientConfigAndLoadGigyaLogin() {
+            try {
+                const response = await fetch('/api/client-config');
+                if (!response.ok) throw new Error('Failed to fetch client config');
+                const config = await response.json();
+                clientLoginConfig.RP_SITE_API_KEY = config.rpSiteApiKey;
+                if (!clientLoginConfig.RP_SITE_API_KEY) throw new Error('RP Site API Key not received');
+                const sdkScript = document.getElementById('gigya-sdk-script');
+                sdkScript.src = `https://cdns.gigya.com/js/gigya.js?apiKey=${clientLoginConfig.RP_SITE_API_KEY}`;
+                sdkScript.onload = initializeLoginScreenSet;
+                sdkScript.onerror = () => {
+                    document.getElementById('loginContainer').innerHTML = '<p>Error loading login services.</p>';
+                };
+            } catch (error) {
+                document.getElementById('loginContainer').innerHTML = '<p>Error loading login configuration.</p>';
+            }
+        }
+        function initializeLoginScreenSet() {
+            if (typeof gigya === 'undefined') {
+                document.getElementById('loginContainer').innerHTML = '<p>Login services unavailable.</p>';
+                return;
+            }
+            const oidcButton = [{
+                providerName: clientLoginConfig.OP_PROVIDER_NAME,
+                type: 'oidc',
+                buttonText: 'Login with Company Account',
+                cssClass: 'gigya-oidc-button'
+            }];
+            gigya.accounts.showScreenSet({
+                screenSet: 'Default-RegistrationLogin',
+                startScreen: 'gigya-login-screen',
+                containerID: 'loginContainer',
+                customButtons: oidcButton,
+                sessionExpiration: -1,
+                onLogin: function(eventObj) {
+                    if (eventObj.context.provider !== clientLoginConfig.OP_PROVIDER_NAME && eventObj.UID) {
+                        window.location.href = '/catalog.html';
+                    }
+                },
+                onError: function(eventObj) {
+                    alert(`Login Error: ${eventObj.errorMessage || 'An unknown error occurred.'}`);
+                }
+            });
+        }
+        document.addEventListener('DOMContentLoaded', fetchClientConfigAndLoadGigyaLogin);
+    </script>
+</body>
+</html> 

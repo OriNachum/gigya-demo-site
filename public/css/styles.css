@@ -1,0 +1,80 @@
+body { 
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+    margin: 0; 
+    padding: 0; 
+    background-color: #fffaf0; 
+    color: #4a3b31; 
+    line-height: 1.6; 
+}
+header { 
+    background-color: #ffdab9; 
+    color: #4a3b31; 
+    padding: 1.2em 0; 
+    text-align: center; 
+    border-bottom: 4px solid #ffb366; 
+}
+header h1 { 
+    margin: 0; 
+    font-size: 2.5em; 
+    font-family: 'Brush Script MT', 'Comic Sans MS', cursive; 
+}
+.container { 
+    width: 90%; 
+    max-width: 1000px; 
+    margin: 25px auto; 
+    padding: 25px; 
+    background-color: #ffffff; 
+    border-radius: 10px; 
+    box-shadow: 0 5px 15px rgba(0,0,0,0.08); 
+}
+h2 { 
+    color: #d2691e; 
+    font-size: 1.8em; 
+    border-bottom: 2px solid #ffdab9; 
+    padding-bottom: 0.3em; 
+    margin-top: 0; 
+    margin-bottom: 1em;
+}
+.candy-catalog { 
+    margin-bottom: 25px; 
+}
+.candy-grid { 
+    display: grid; 
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); 
+    gap: 20px; 
+}
+.candy-item { 
+    border: 1px solid #ffe4c4; 
+    padding: 18px; 
+    border-radius: 8px; 
+    background-color: #fff8f0; 
+    text-align: center; 
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out; 
+}
+.candy-item:hover { 
+    transform: translateY(-5px); 
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1); 
+}
+.candy-item img { 
+    max-width: 120px; 
+    height: 120px; 
+    object-fit: cover; 
+    border-radius: 6px; 
+    margin-bottom: 12px; 
+    border: 2px solid #ffdab9; 
+}
+.candy-item h4 { 
+    margin-top: 0; 
+    margin-bottom: 8px; 
+    color: #8b5a2b; 
+    font-size: 1.2em; 
+}
+.price { 
+    font-weight: bold; 
+    color: #c04000; 
+    font-size: 1.1em; 
+    margin-bottom: 10px; 
+}
+.hidden { 
+    display: none !important; 
+} 

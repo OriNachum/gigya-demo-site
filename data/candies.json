@@ -1,0 +1,34 @@
+[
+    {
+        "id": "c1",
+        "name": "Rainbow Lollipop Swirl",
+        "imageUrl": "/images/candy1.png",
+        "price": 2.50,
+        "type": "regular",
+        "description": "A vibrant swirl of fruity delight that will make your taste buds dance with joy!"
+    },
+    {
+        "id": "c2",
+        "name": "Velvet Choco Dream Bar",
+        "imageUrl": "/images/candy2.png",
+        "price": 3.75,
+        "type": "regular",
+        "description": "Luxuriously creamy milk chocolate embracing a dreamy, gooey caramel core."
+    },
+    {
+        "id": "s1",
+        "name": "Golden Gummy Gem (Club)",
+        "imageUrl": "/images/special_candy1.png",
+        "price": 5.99,
+        "type": "special_club",
+        "description": "An exclusive golden gummy bear, sparkling with edible glitter. A treasure for club members only!"
+    },
+    {
+        "id": "s2",
+        "name": "Mystic Truffle Elixir (Club)",
+        "imageUrl": "/images/special_candy2.png",
+        "price": 7.25,
+        "type": "special_club",
+        "description": "A rich, dark chocolate truffle infused with a hint of exotic raspberry. A luxurious treat for our valued members."
+    }
+] 

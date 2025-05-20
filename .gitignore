@@ -1,7 +1,12 @@
+# Node
+node_modules/
+.env
+npm-debug.log
+*.log
+
 # Logs
 logs
 *.log
-npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 lerna-debug.log*
@@ -39,7 +44,6 @@ bower_components
 build/Release
 
 # Dependency directories
-node_modules/
 jspm_packages/
 
 # Snowpack dependency directory (https://snowpack.dev/)
@@ -73,7 +77,6 @@ web_modules/
 .yarn-integrity
 
 # dotenv environment variable files
-.env
 .env.development.local
 .env.test.local
 .env.production.local
