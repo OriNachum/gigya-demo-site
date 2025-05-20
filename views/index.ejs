@@ -9,8 +9,12 @@
 <body>
   <h1>Welcome to Viki's Sweets Shop!</h1>
   <div id="login-section">
-    <!-- SAP-CDC login screen will go here -->
-    <a href="/login">Login with SAP CDC</a>
+    <% if (!user) { %>
+      <a href="/login">Login with SAP CDC</a>
+    <% } else { %>
+      <a href="/profile">Profile</a> |
+      <a href="/logout">Logout</a>
+    <% } %>
   </div>
   <div id="catalog-section">
     <!-- Candies catalog will go here -->
