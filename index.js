@@ -13,6 +13,23 @@ const REDIRECT_URI = process.env.REDIRECT_URI || 'http://localhost:3000/oidc/cal
 const OIDC_BASE = `https://accounts.us1.gigya.com/oidc/op/v1.0/${OP_SITE_API_KEY}`;
 const CLIENT_ID = process.env.CLIENT_ID;
 
+// Candies data
+const candies = [
+  { name: 'Lollipop', price: 1.5, img: '/lollipop.png', special: false },
+  { name: 'Gummy Bears', price: 2.0, img: '/gummybears.png', special: false },
+  { name: 'Chocolate Truffle', price: 3.5, img: '/truffle.png', special: true },
+  { name: 'Marshmallow Twist', price: 2.5, img: '/marshmallow.png', special: true },
+];
+
+function isInClubMembers(user) {
+  // Club members model: group = 'Sweet shop'
+  return user && user.groups && user.groups.includes('Sweet shop');
+}
+function isInOrgSAPCDC(user) {
+  // Organizations model: group = 'SAP CDC'
+  return user && user.organizations && user.organizations.includes('SAP CDC');
+}
+
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 app.use(express.static(path.join(__dirname, 'public')));
@@ -22,17 +39,37 @@ app.use(cookieParser());
 app.get('/', async (req, res) => {
   const access_token = req.cookies.access_token;
   let user = null;
+  let userGroups = [];
+  let userOrgs = [];
   if (access_token) {
     try {
       const userinfoRes = await axios.get(`${OIDC_BASE}/userinfo`, {
         headers: { Authorization: `Bearer ${access_token}` },
       });
       user = userinfoRes.data;
+      user.groups = user.groups || user.memberOf || [];
+      user.organizations = user.organizations || user.orgs || [];
+      userGroups = user.groups;
+      userOrgs = user.organizations;
     } catch (err) {
       // ignore, treat as not logged in
     }
   }
-  res.render('index', { user });
+  let visibleCandies = [];
+  let showSendCandy = false;
+  let showSpecial = false;
+  if (user) {
+    visibleCandies = candies.filter(c => !c.special || isInClubMembers(user));
+    showSendCandy = isInOrgSAPCDC(user);
+    showSpecial = isInClubMembers(user);
+  }
+  res.render('index', {
+    user,
+    candies: visibleCandies,
+    showSendCandy,
+    showSpecial,
+    requireLogin: true
+  });
 });
 
 // OIDC Login
@@ -59,11 +96,11 @@ app.get('/oidc/callback', async (req, res) => {
   const { code, error, error_description } = req.query;
   if (error) {
     console.error('OIDC error:', error, error_description);
-    return res.status(400).send(`OIDC error: ${error} - ${error_description}`);
+    return res.render('popup-close', { success: false, error: error_description || error });
   }
   if (!code) {
     console.error('Missing code in callback');
-    return res.status(400).send('Missing code');
+    return res.render('popup-close', { success: false, error: 'Missing code' });
   }
   try {
     const params = new URLSearchParams({
@@ -81,10 +118,10 @@ app.get('/oidc/callback', async (req, res) => {
     const { access_token, refresh_token, id_token } = tokenRes.data;
     res.cookie('access_token', access_token, { httpOnly: true, secure: false });
     res.cookie('refresh_token', refresh_token, { httpOnly: true, secure: false });
-    res.redirect('/');
+    res.render('popup-close', { success: true, error: null });
   } catch (err) {
     console.error('Token exchange failed:', err.stack || err);
-    res.status(500).send('Token exchange failed: ' + err.message);
+    res.render('popup-close', { success: false, error: err.message });
   }
 });
 

@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Login Complete</title>
+</head>
+<body>
+  <script>
+    if (window.opener) {
+      window.opener.postMessage({ type: 'oidc-login', success: "<%= success %>", error: "<%= error ? error.replace(/\"/g, '') : '' %>" }, '*');
+      window.close();
+    } else {
+      document.write('You may close this window.');
+    }
+  </script>
+  <noscript>
+    Login complete. You may close this window.
+  </noscript>
+</body>
+</html> 
