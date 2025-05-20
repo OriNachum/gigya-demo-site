@@ -71,7 +71,7 @@ app.get('/oidc/callback', async (req, res) => {
       code,
       redirect_uri: REDIRECT_URI,
       client_id: CLIENT_ID,
-      client_secret: process.env.USER_SECRET,
+      client_secret: process.env.CLIENT_SECRET,
     });
     console.log('Token request params:', params.toString());
     const tokenRes = await axios.post(`${OIDC_BASE}/token`, params, {
