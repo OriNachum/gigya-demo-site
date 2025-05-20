@@ -1,0 +1,32 @@
+body {
+  font-family: 'Comic Sans MS', cursive, sans-serif;
+  background: #fff0f6;
+  color: #6d2177;
+  margin: 0;
+  padding: 0;
+}
+h1 {
+  text-align: center;
+  margin-top: 2rem;
+  color: #d72660;
+}
+#catalog-section {
+  margin: 2rem auto;
+  max-width: 600px;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(215, 38, 96, 0.1);
+  padding: 2rem;
+}
+#login-section {
+  text-align: center;
+  margin-top: 1rem;
+}
+a {
+  color: #d72660;
+  text-decoration: none;
+  font-weight: bold;
+}
+a:hover {
+  text-decoration: underline;
+} 
