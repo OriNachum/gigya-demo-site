@@ -77,4 +77,8 @@ h2 {
 }
 .hidden { 
     display: none !important; 
-} 
+}
+
+#welcome-message {
+    display: none;
+}

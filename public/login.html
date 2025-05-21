@@ -5,27 +5,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Vikis Sweets Shop</title>
     <link rel="stylesheet" href="/css/styles.css">
-    <script id="gigya-sdk-script" type="text/javascript" src="https://cdns.us1.gigya.com/js/gigya.js?apiKey=4_4qEhi-moqNMXf6PUHjjw-g"></script>
+    <script type="text/javascript" src="https://cdns.us1.gigya.com/js/gigya.js?apiKey=4_4qEhi-moqNMXf6PUHjjw-g"></script>
 </head>
 <body>
     <header>
         <h1>Vikis Sweets Shop</h1>
     </header>
-    <div class="container">
+    <h2 id="welcome-message">Welcome!</h2>
+    <div id="container">
         <h2>Login or Register</h2>
         <div id="loginContainer">
             <p>Loading login options...</p>
         </div>
     </div>
+    <iframe id="catalog" src="catalog.html" frameborder="0" height="100%" width="100%" hidden></iframe>
     <script>
         const clientLoginConfig = {
             RP_SITE_API_KEY: '4_4qEhi-moqNMXf6PUHjjw-g',
             OP_PROVIDER_NAME: 'oidc-opopop'
         };
         const oidcButton = [{
-            provider: clientLoginConfig.OP_PROVIDER_NAME,
+            opName: clientLoginConfig.OP_PROVIDER_NAME,
             type: 'oidc',
-            //buttonText: 'Login with Company Account',
             iconURL: '/images/chocolate_candy.jpg'
         }];
         gigya.accounts.showScreenSet({
@@ -33,22 +34,21 @@
             containerID: 'loginContainer',
             customButtons: oidcButton,
             sessionExpiration: -1,
-            onLogin: function(eventObj) {
-                console.log(eventObj.context);
-                if (eventObj.context.provider !== clientLoginConfig.OP_PROVIDER_NAME && eventObj.UID) {
-                    window.location.href = '/catalog.html';
-                }
-            },
             onError: function(eventObj) {
                 alert(`Login Error: ${eventObj.errorMessage || 'An unknown error occurred.'}`);
             }
         });
         gigya.accounts.addEventHandlers({
             onLogin: function(response) {
-                document.getElementById('loginContainer').style.display = 'none';
-                const name = response.profile.firstName || response.profile.nickname || 'User';
+                console.log(response);
+                // window.location.href = '/catalog.html';
+                document.getElementById('container').style.display = 'none';
+                const name = response?.profile?.firstName || response?.profile?.nickname || 'User';
                 document.getElementById('welcome-message').textContent = `Welcome, ${name}! 🎉`;
                 document.getElementById('welcome-message').style.display = 'block';
+                const catalog = document.getElementById('catalog')
+                catalog.contentWindow.postMessage(response, "*"); // Replace * with target origin if possible
+                catalog.style.display = 'block';
             }
         });
         </script>

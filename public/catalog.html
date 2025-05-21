@@ -8,9 +8,6 @@
     <script id="gigya-sdk-script" src="https://cdns.gigya.com/js/gigya.js?apiKey=4_4qEhi-moqNMXf6PUHjjw-g"></script>
 </head>
 <body>
-    <header>
-        <h1>Vikis Sweets Shop</h1>
-    </header>
     <div class="container">
         <div id="userInfo" class="user-info hidden">
             <p>Welcome, <span id="userName">Guest</span>!</p>
@@ -25,45 +22,45 @@
         </div>
     </div>
     <script>
-        const clientCatalogConfig = {
-            RP_SITE_API_KEY: '',
-            accessToken: null
-        };
-        
-        async function checkLoginStateAndTokens() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const accessTokenFromUrl = urlParams.get('access_token');
-            if (accessTokenFromUrl) {
-                clientCatalogConfig.accessToken = decodeURIComponent(accessTokenFromUrl);
-                window.history.replaceState({}, document.title, "/catalog.html");
-                fetchGigyaAccountInfo();
-            } else {
-                fetchGigyaAccountInfo();
-            }
-        }
-        function fetchGigyaAccountInfo() {
-            if (typeof gigya === 'undefined' || !clientCatalogConfig.RP_SITE_API_KEY) {
-                showCandies(null);
-                return;
-            }
-            gigya.accounts.getAccountInfo({
-                include: 'profile,data',
-                callback: function(response) {
-                    if (response.errorCode === 0 && response.UID) {
-                        showCandies(response);
-                    } else {
-                        showCandies(null);
-                    }
-                }
-            });
-        }
+        window.addEventListener("message", (event) => {
+            const userData = event.data;
+            console.log("Received data:", userData);
+            showCandies(userData)
+        });
+        // async function checkLoginStateAndTokens() {
+        //     const urlParams = new URLSearchParams(window.location.search);
+        //     const accessTokenFromUrl = urlParams.get('access_token');
+        //     if (accessTokenFromUrl) {
+        //         clientCatalogConfig.accessToken = decodeURIComponent(accessTokenFromUrl);
+        //         window.history.replaceState({}, document.title, "/catalog.html");
+        //         fetchGigyaAccountInfo();
+        //     } else {
+        //         fetchGigyaAccountInfo();
+        //     }
+        // }
+        // function fetchGigyaAccountInfo() {
+        //     if (typeof gigya === 'undefined') {
+        //         showCandies(null);
+        //         return;
+        //     }
+        //     gigya.accounts.getAccountInfo({
+        //         include: 'profile,data',
+        //         callback: function(response) {
+        //             if (response.errorCode === 0 && response.UID) {
+        //                 showCandies(response);
+        //             } else {
+        //                 showCandies(null);
+        //             }
+        //         }
+        //     });
+        // }
         async function showCandies(userData) {
             const response = await fetch('/api/candies');
             const allCandies = await response.json();
             const regularCandiesData = allCandies.filter(c => c.type === 'regular');
             displayCandies(regularCandiesData, 'regularCandies');
             const specialCandiesSection = document.getElementById('specialCandies');
-            if (userData && userData.member_level !== null && userData.member_name !== null) {
+            if (userData && userData.member_level !== undefined && userData.member_name !== undefined) {
                 const specialCandiesData = allCandies.filter(c => c.type === 'special_club');
                 displayCandies(specialCandiesData, 'specialCandies');
                 specialCandiesSection.classList.remove('hidden');
