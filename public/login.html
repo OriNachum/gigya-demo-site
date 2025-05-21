@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Vikis Sweets Shop</title>
     <link rel="stylesheet" href="/css/styles.css">
-    <script id="gigya-sdk-script" src=""></script>
+    <script id="gigya-sdk-script" type="text/javascript" src="https://cdns.us1.gigya.com/js/gigya.js?apiKey=4_4qEhi-moqNMXf6PUHjjw-g"></script>
 </head>
 <body>
     <header>
@@ -19,54 +19,38 @@
     </div>
     <script>
         const clientLoginConfig = {
-            RP_SITE_API_KEY: process.env.RP_SITE_API_KEY || '',
-            OP_PROVIDER_NAME: 'opopop'
+            RP_SITE_API_KEY: '4_4qEhi-moqNMXf6PUHjjw-g',
+            OP_PROVIDER_NAME: 'oidc-opopop'
         };
-        async function fetchClientConfigAndLoadGigyaLogin() {
-            try {
-                const response = await fetch('/api/client-config');
-                if (!response.ok) throw new Error('Failed to fetch client config');
-                const config = await response.json();
-                clientLoginConfig.RP_SITE_API_KEY = config.rpSiteApiKey;
-                if (!clientLoginConfig.RP_SITE_API_KEY) throw new Error('RP Site API Key not received');
-                const sdkScript = document.getElementById('gigya-sdk-script');
-                sdkScript.src = `https://cdns.gigya.com/js/gigya.js?apiKey=${clientLoginConfig.RP_SITE_API_KEY}`;
-                sdkScript.onload = initializeLoginScreenSet;
-                sdkScript.onerror = () => {
-                    document.getElementById('loginContainer').innerHTML = '<p>Error loading login services.</p>';
-                };
-            } catch (error) {
-                document.getElementById('loginContainer').innerHTML = '<p>Error loading login configuration.</p>';
-            }
-        }
-        function initializeLoginScreenSet() {
-            if (typeof gigya === 'undefined') {
-                document.getElementById('loginContainer').innerHTML = '<p>Login services unavailable.</p>';
-                return;
-            }
-            const oidcButton = [{
-                providerName: clientLoginConfig.OP_PROVIDER_NAME,
-                type: 'oidc',
-                buttonText: 'Login with Company Account',
-                cssClass: 'gigya-oidc-button'
-            }];
-            gigya.accounts.showScreenSet({
-                screenSet: 'Default-RegistrationLogin',
-                startScreen: 'gigya-login-screen',
-                containerID: 'loginContainer',
-                customButtons: oidcButton,
-                sessionExpiration: -1,
-                onLogin: function(eventObj) {
-                    if (eventObj.context.provider !== clientLoginConfig.OP_PROVIDER_NAME && eventObj.UID) {
-                        window.location.href = '/catalog.html';
-                    }
-                },
-                onError: function(eventObj) {
-                    alert(`Login Error: ${eventObj.errorMessage || 'An unknown error occurred.'}`);
+        const oidcButton = [{
+            provider: clientLoginConfig.OP_PROVIDER_NAME,
+            type: 'oidc',
+            //buttonText: 'Login with Company Account',
+            iconURL: '/images/chocolate_candy.jpg'
+        }];
+        gigya.accounts.showScreenSet({
+            screenSet: 'OIDC-RegistrationLogin',
+            containerID: 'loginContainer',
+            customButtons: oidcButton,
+            sessionExpiration: -1,
+            onLogin: function(eventObj) {
+                console.log(eventObj.context);
+                if (eventObj.context.provider !== clientLoginConfig.OP_PROVIDER_NAME && eventObj.UID) {
+                    window.location.href = '/catalog.html';
                 }
-            });
-        }
-        document.addEventListener('DOMContentLoaded', fetchClientConfigAndLoadGigyaLogin);
-    </script>
-</body>
+            },
+            onError: function(eventObj) {
+                alert(`Login Error: ${eventObj.errorMessage || 'An unknown error occurred.'}`);
+            }
+        });
+        gigya.accounts.addEventHandlers({
+            onLogin: function(response) {
+                document.getElementById('loginContainer').style.display = 'none';
+                const name = response.profile.firstName || response.profile.nickname || 'User';
+                document.getElementById('welcome-message').textContent = `Welcome, ${name}! 🎉`;
+                document.getElementById('welcome-message').style.display = 'block';
+            }
+        });
+        </script>
+    </body>
 </html> 

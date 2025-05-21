@@ -95,7 +95,7 @@ app.get('/catalog.html', (req, res) => {
 });
 
 app.get('/', (req, res) => {
-    res.redirect('/catalog.html');
+    res.redirect('/login.html');
 });
 
 // --- Start Server ---
