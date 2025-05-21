@@ -12,6 +12,9 @@
         <h1>Vikis Sweets Shop</h1>
     </header>
     <h2 id="welcome-message">Welcome!</h2>
+    <div id="logout-container">
+        <button id="logout-btn" class="logout-btn">Logout</button>
+    </div>
     <div id="container">
         <h2>Login or Register</h2>
         <div id="loginContainer">
@@ -29,28 +32,82 @@
             type: 'oidc',
             iconURL: '/images/chocolate_candy.jpg'
         }];
-        gigya.accounts.showScreenSet({
-            screenSet: 'OIDC-RegistrationLogin',
-            containerID: 'loginContainer',
-            customButtons: oidcButton,
-            sessionExpiration: -1,
-            onError: function(eventObj) {
-                alert(`Login Error: ${eventObj.errorMessage || 'An unknown error occurred.'}`);
+
+        // Check if user was logged out previously
+        function checkLogoutState() {
+            const wasLoggedOut = localStorage.getItem('loggedOut') === 'true';
+            if (wasLoggedOut) {
+                // User has been logged out, no need to check login status
+                return false;
             }
+            return true;
+        }
+
+        // Check login status first if not logged out
+        function initializeLoginState() {
+            if (!checkLogoutState()) {
+                // User was logged out, don't try to auto-login
+                return;
+            }
+
+            gigya.accounts.getAccountInfo({
+                callback: function(response) {
+                    if (response.errorCode === 0 && response.UID) {
+                        // User is already logged in
+                        handleLoginSuccess(response);
+                    } else {
+                        // User is not logged in, show login screen
+                        showLoginScreen();
+                    }
+                }
+            });
+        }
+
+        function showLoginScreen() {
+            gigya.accounts.showScreenSet({
+                screenSet: 'OIDC-RegistrationLogin',
+                containerID: 'loginContainer',
+                customButtons: oidcButton,
+                sessionExpiration: -1,
+                onError: function(eventObj) {
+                    alert(`Login Error: ${eventObj.errorMessage || 'An unknown error occurred.'}`);
+                }
+            });
+        }
+
+        function handleLoginSuccess(response) {
+            document.getElementById('container').style.display = 'none';
+            const name = response?.profile?.firstName || response?.profile?.nickname || 'User';
+            document.getElementById('welcome-message').textContent = `Welcome, ${name}! 🎉`;
+            document.getElementById('welcome-message').style.display = 'block';
+            
+            // Show logout button
+            document.getElementById('logout-btn').style.display = 'inline-block';
+            
+            const catalog = document.getElementById('catalog');
+            catalog.contentWindow.postMessage(response, "*"); // Replace * with target origin if possible
+            catalog.style.display = 'block';
+            
+            // Clear logged out state
+            localStorage.removeItem('loggedOut');
+        }
+
+        // Setup logout button click handler
+        document.getElementById('logout-btn').addEventListener('click', function() {
+            // Set logged out flag in localStorage
+            localStorage.setItem('loggedOut', 'true');
+            
+            // Call the server-side logout endpoint
+            window.location.href = '/auth/logout';
         });
+
+        // Initialize login state check
+        initializeLoginState();
+
+        // Add event handlers for login events
         gigya.accounts.addEventHandlers({
-            onLogin: function(response) {
-                console.log(response);
-                // window.location.href = '/catalog.html';
-                document.getElementById('container').style.display = 'none';
-                const name = response?.profile?.firstName || response?.profile?.nickname || 'User';
-                document.getElementById('welcome-message').textContent = `Welcome, ${name}! 🎉`;
-                document.getElementById('welcome-message').style.display = 'block';
-                const catalog = document.getElementById('catalog')
-                catalog.contentWindow.postMessage(response, "*"); // Replace * with target origin if possible
-                catalog.style.display = 'block';
-            }
+            onLogin: handleLoginSuccess
         });
-        </script>
+    </script>
     </body>
 </html> 

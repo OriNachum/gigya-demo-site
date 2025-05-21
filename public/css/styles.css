@@ -88,3 +88,26 @@ h2 {
 #welcome-message {
     display: none;
 }
+
+/* Logout Button Styles */
+.logout-btn {
+    background-color: #ffb366;
+    color: #4a3b31;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.2s ease;
+    margin-top: 15px;
+    display: none;
+}
+
+.logout-btn:hover {
+    background-color: #ff9933;
+}
+
+#logout-container {
+    text-align: center;
+    margin-top: 20px;
+}
