@@ -5,6 +5,9 @@ body {
     background-color: #fffaf0; 
     color: #4a3b31; 
     line-height: 1.6; 
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
 }
 header { 
     background-color: #ffdab9; 
@@ -25,7 +28,10 @@ header h1 {
     padding: 25px; 
     background-color: #ffffff; 
     border-radius: 10px; 
-    box-shadow: 0 5px 15px rgba(0,0,0,0.08); 
+    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+    flex: 1;
+    min-height: 80vh;
+    overflow-y: auto;
 }
 h2 { 
     color: #d2691e; 
