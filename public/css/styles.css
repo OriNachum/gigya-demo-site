@@ -108,6 +108,7 @@ h2 {
 }
 
 #logout-container {
-    text-align: center;
+    text-align: right;
     margin-top: 20px;
+    margin-right: 20px;
 }

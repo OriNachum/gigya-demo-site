@@ -11,17 +11,12 @@
     <header>
         <h1>Vikis Sweets Shop</h1>
     </header>
-    <h2 id="welcome-message">Welcome!</h2>
-    <div id="logout-container">
-        <button id="logout-btn" class="logout-btn">Logout</button>
-    </div>
     <div id="container">
         <h2>Login or Register</h2>
         <div id="loginContainer">
             <p>Loading login options...</p>
         </div>
     </div>
-    <iframe id="catalog" src="catalog.html" frameborder="0" height="100%" width="100%" hidden></iframe>
     <script>
         const clientLoginConfig = {
             RP_SITE_API_KEY: '4_4qEhi-moqNMXf6PUHjjw-g',
@@ -76,30 +71,24 @@
         }
 
         function handleLoginSuccess(response) {
-            document.getElementById('container').style.display = 'none';
-            const name = response?.profile?.firstName || response?.profile?.nickname || 'User';
-            document.getElementById('welcome-message').textContent = `Welcome, ${name}! 🎉`;
-            document.getElementById('welcome-message').style.display = 'block';
+            //document.contentWindow.postMessage(response, "*"); // Replace * with target origin if possible
+            sessionStorage.setItem("response", JSON.stringify(response));
+            window.location.href = 'catalog.html';
+            // document.getElementById('container').style.display = 'none';
+            // document.getElementById('loginContainer').style.display = 'none';
+            // const name = response?.profile?.firstName || response?.profile?.nickname || 'User';
+            // document.getElementById('welcome-message').textContent = `Welcome, ${name}! 🎉`;
+            // document.getElementById('welcome-message').style.display = 'block';
             
-            // Show logout button
-            document.getElementById('logout-btn').style.display = 'inline-block';
+            // // Show logout button
+            // document.getElementById('logout-btn').style.display = 'inline-block';
             
-            const catalog = document.getElementById('catalog');
-            catalog.contentWindow.postMessage(response, "*"); // Replace * with target origin if possible
-            catalog.style.display = 'block';
+            
+            // catalog.style.display = 'block';
             
             // Clear logged out state
-            localStorage.removeItem('loggedOut');
+            // localStorage.removeItem('loggedOut');
         }
-
-        // Setup logout button click handler
-        document.getElementById('logout-btn').addEventListener('click', function() {
-            // Set logged out flag in localStorage
-            localStorage.setItem('loggedOut', 'true');
-            
-            // Call the server-side logout endpoint
-            window.location.href = '/auth/logout';
-        });
 
         // Initialize login state check
         initializeLoginState();

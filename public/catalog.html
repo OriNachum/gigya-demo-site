@@ -8,6 +8,10 @@
     <script id="gigya-sdk-script" src="https://cdns.gigya.com/js/gigya.js?apiKey=4_4qEhi-moqNMXf6PUHjjw-g"></script>
 </head>
 <body>
+    <h2 id="welcome-message">Welcome!</h2>
+    <div id="logout-container">
+        <button id="logout-btn" class="logout-btn">Logout</button>
+    </div>
     <div class="container">
         <div id="userInfo" class="user-info hidden">
             <p>Welcome, <span id="userName">Guest</span>!</p>
@@ -23,10 +27,28 @@
     </div>
     <script>
         window.addEventListener("message", (event) => {
-            const userData = event.data;
+            // const userData = event.data;
+            const userData = JSON.parse(sessionStorage.getItem("response"));
             console.log("Received data:", userData);
+            const name = userData?.profile?.firstName || userData?.profile?.nickname || 'User';
+            document.getElementById('welcome-message').textContent = `Welcome, ${name}! 🎉`;
+            document.getElementById('welcome-message').style.display = 'block';
+            
+            // Show logout button
+            document.getElementById('logout-btn').style.display = 'inline-block';
+            
             showCandies(userData)
         });
+
+        // Setup logout button click handler
+        document.getElementById('logout-btn').addEventListener('click', function() {
+            // Set logged out flag in localStorage
+            localStorage.setItem('loggedOut', 'true');
+
+            // Call the server-side logout endpoint
+            window.location.href = '/auth/logout';
+        });
+        
         // async function checkLoginStateAndTokens() {
         //     const urlParams = new URLSearchParams(window.location.search);
         //     const accessTokenFromUrl = urlParams.get('access_token');
