@@ -18,15 +18,25 @@
         </div>
     </div>
     <script>
-        const clientLoginConfig = {
-            RP_SITE_API_KEY: '4_4qEhi-moqNMXf6PUHjjw-g',
-            OP_PROVIDER_NAME: 'oidc-opopop'
-        };
-        const oidcButton = [{
-            opName: clientLoginConfig.OP_PROVIDER_NAME,
-            type: 'oidc',
-            iconURL: '/images/chocolate_candy.jpg'
-        }];
+        async function showLoginScreen() {
+            const response = await fetch('/api/client-config');
+            const config = await response.json();
+            const oidcButton = [{
+                opName: config.opProviderName,
+                type: 'oidc',
+                iconURL: '/images/login_button.png'
+            }];
+            
+            gigya.accounts.showScreenSet({
+                screenSet: 'OIDC-RegistrationLogin',
+                containerID: 'loginContainer',
+                customButtons: oidcButton,
+                sessionExpiration: -1,
+                onError: function(eventObj) {
+                    alert(`Login Error: ${eventObj.errorMessage || 'An unknown error occurred.'}`);
+                }
+            });
+        }
 
         // Check if user was logged out previously
         function checkLogoutState() {
@@ -54,18 +64,6 @@
                         // User is not logged in, show login screen
                         showLoginScreen();
                     }
-                }
-            });
-        }
-
-        function showLoginScreen() {
-            gigya.accounts.showScreenSet({
-                screenSet: 'OIDC-RegistrationLogin',
-                containerID: 'loginContainer',
-                customButtons: oidcButton,
-                sessionExpiration: -1,
-                onError: function(eventObj) {
-                    alert(`Login Error: ${eventObj.errorMessage || 'An unknown error occurred.'}`);
                 }
             });
         }

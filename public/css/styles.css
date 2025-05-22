@@ -112,3 +112,56 @@ h2 {
     margin-top: 20px;
     margin-right: 20px;
 }
+
+
+/* My Profile Button Styles */
+.show-my-profile-btn {
+    background-color: #ffb366;
+    color: #4a3b31;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.2s ease;
+    margin-top: 15px;
+    display: inline-block;
+}
+
+.show-my-profile-btn:hover {
+    background-color: #ff9933;
+}
+
+.hide-my-profile-btn {
+    background-color: #ffb366;
+    color: #4a3b31;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.2s ease;
+    margin-top: 15px;
+    display: none; 
+}
+
+.hide-my-profile-btn:hover {
+    background-color: #ff9933;
+}
+
+#user-profile {
+    display: none;
+    margin-top: 10px;
+    padding: 10px;
+    border: 1px solid #ffe4c4;
+    border-radius: 8px;
+    background-color: #fff8f0;
+    width: 300px;
+    align-self: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+#user-profile h2 {
+    color: #8b5a2b;
+    font-size: 1.2em;
+}

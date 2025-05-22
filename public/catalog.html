@@ -10,10 +10,13 @@
 <body>
     <h2 id="welcome-message">Welcome!</h2>
     <div id="logout-container">
+        <button id="show-my-profile-btn" class="show-my-profile-btn">Show My Profile</button>
+        <button id="hide-my-profile-btn" class="hide-my-profile-btn" >Hide My Profile</button>
         <button id="logout-btn" class="logout-btn">Logout</button>
     </div>
+    <div id="user-profile"></div>
     <div class="container">
-        <div id="userInfo" class="user-info hidden">
+        <div id="userNameInfo" class="user-name-info hidden">
             <p>Welcome, <span id="userName">Guest</span>!</p>
         </div>
         <div id="regularCandies" class="candy-catalog">
@@ -27,9 +30,7 @@
     </div>
     <script>
         window.addEventListener("message", (event) => {
-            // const userData = event.data;
             const userData = JSON.parse(sessionStorage.getItem("response"));
-            console.log("Received data:", userData);
             const name = userData?.profile?.firstName || userData?.profile?.nickname || 'User';
             document.getElementById('welcome-message').textContent = `Welcome, ${name}! 🎉`;
             document.getElementById('welcome-message').style.display = 'block';
@@ -40,6 +41,34 @@
             showCandies(userData)
         });
 
+        const showProfileBtn = document.getElementById("show-my-profile-btn");
+
+        showProfileBtn.addEventListener("click", () => {
+            const userData = JSON.parse(sessionStorage.getItem("response"));
+            const name = userData?.profile?.firstName || userData?.profile?.nickname || 'Unknown';
+            const gender = userData?.profile?.gender || 'Unknown';
+            const memberLevel = userData?.member_level || 'Unknown';
+            const userProfileDiv = document.getElementById("user-profile");
+            userProfileDiv.innerHTML = `
+            <h2>👤 User Profile</h2>
+            <strong>Name:</strong> ${name}<br>
+            <strong>Gender:</strong> ${gender}<br>
+            <strong>Level:</strong> ${memberLevel}
+      `;
+            userProfileDiv.style.display = "block";
+            document.getElementById('show-my-profile-btn').style.display = 'none';
+            document.getElementById('hide-my-profile-btn').style.display = 'inline-block';
+        });
+
+        const hideProfileBtn = document.getElementById("hide-my-profile-btn");
+
+        hideProfileBtn.addEventListener("click", () => {
+            const userProfileDiv = document.getElementById("user-profile");
+            userProfileDiv.style.display = "none";
+            document.getElementById('show-my-profile-btn').style.display = 'inline-block';
+            document.getElementById('hide-my-profile-btn').style.display = 'none';
+        });
+
         // Setup logout button click handler
         document.getElementById('logout-btn').addEventListener('click', function() {
             // Set logged out flag in localStorage
@@ -48,34 +77,7 @@
             // Call the server-side logout endpoint
             window.location.href = '/auth/logout';
         });
-        
-        // async function checkLoginStateAndTokens() {
-        //     const urlParams = new URLSearchParams(window.location.search);
-        //     const accessTokenFromUrl = urlParams.get('access_token');
-        //     if (accessTokenFromUrl) {
-        //         clientCatalogConfig.accessToken = decodeURIComponent(accessTokenFromUrl);
-        //         window.history.replaceState({}, document.title, "/catalog.html");
-        //         fetchGigyaAccountInfo();
-        //     } else {
-        //         fetchGigyaAccountInfo();
-        //     }
-        // }
-        // function fetchGigyaAccountInfo() {
-        //     if (typeof gigya === 'undefined') {
-        //         showCandies(null);
-        //         return;
-        //     }
-        //     gigya.accounts.getAccountInfo({
-        //         include: 'profile,data',
-        //         callback: function(response) {
-        //             if (response.errorCode === 0 && response.UID) {
-        //                 showCandies(response);
-        //             } else {
-        //                 showCandies(null);
-        //             }
-        //         }
-        //     });
-        // }
+
         async function showCandies(userData) {
             const response = await fetch('/api/candies');
             const allCandies = await response.json();

@@ -37,6 +37,7 @@ try {
 app.get('/api/client-config', (req, res) => {
     res.json({
         rpSiteApiKey: process.env.RP_SITE_API_KEY,
+        opProviderName: process.env.OP_PROVIDER_NAME,
         opUserinfoEndpointUrl: process.env.OP_USERINFO_ENDPOINT_URL
     });
 });
