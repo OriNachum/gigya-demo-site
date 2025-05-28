@@ -16,9 +16,6 @@
     </div>
     <div id="user-profile"></div>
     <div class="container">
-        <div id="userNameInfo" class="user-name-info hidden">
-            <p>Welcome, <span id="userName">Guest</span>!</p>
-        </div>
         <div id="regularCandies" class="candy-catalog">
             <h2>Regular Candies</h2>
             <div class="candy-grid"></div>
@@ -27,18 +24,48 @@
             <h2>Club Member Specials!</h2>
             <div class="candy-grid"></div>
         </div>
+        <div id="group-info" class="group-info hidden">
+            <p>You are logged in to group <span id="userGroup">XXX</span>.</p>
+        </div>
     </div>
     <script>
+        // Show welcome message
         window.addEventListener("message", (event) => {
             const userData = JSON.parse(sessionStorage.getItem("response"));
+            console.log(JSON.stringify(userData));
             const name = userData?.profile?.firstName || userData?.profile?.nickname || 'User';
             document.getElementById('welcome-message').textContent = `Welcome, ${name}! 🎉`;
             document.getElementById('welcome-message').style.display = 'block';
+
+            // Show group information
+            const group = userData?.data.group_name || 'Unknown';
+            const groupInfoDiv = document.getElementById('group-info');
+            document.getElementById('userGroup').textContent = group;
+            groupInfoDiv.classList.remove('hidden');
             
             // Show logout button
             document.getElementById('logout-btn').style.display = 'inline-block';
             
             showCandies(userData)
+        });
+
+        window.addEventListener("group_name_message", (event) => {
+            const userData = JSON.parse(sessionStorage.getItem("response"));
+            const name = userData?.profile?.firstName || userData?.profile?.nickname || 'User';
+            const group = userData?.group || 'Unknown'; // Replace 'group' with the actual key for group info in userData
+
+            document.getElementById('welcome-message').textContent = `Welcome, ${name}! 🎉`;
+            document.getElementById('welcome-message').style.display = 'block';
+
+            // Show group information
+            const groupInfoDiv = document.getElementById('group-info');
+            document.getElementById('userGroup').textContent = group;
+            groupInfoDiv.classList.remove('hidden');
+
+            // Show logout button
+            document.getElementById('logout-btn').style.display = 'inline-block';
+
+            showCandies(userData);
         });
 
         const showProfileBtn = document.getElementById("show-my-profile-btn");
@@ -47,7 +74,7 @@
             const userData = JSON.parse(sessionStorage.getItem("response"));
             const name = userData?.profile?.firstName || userData?.profile?.nickname || 'Unknown';
             const gender = userData?.profile?.gender || 'Unknown';
-            const memberLevel = userData?.member_level || 'Unknown';
+            const memberLevel = userData?.data?.member_level || 'Unknown';
             const userProfileDiv = document.getElementById("user-profile");
             userProfileDiv.innerHTML = `
             <h2>👤 User Profile</h2>
@@ -73,7 +100,8 @@
         document.getElementById('logout-btn').addEventListener('click', function() {
             // Set logged out flag in localStorage
             localStorage.setItem('loggedOut', 'true');
-
+            sessionStorage.clear();
+            
             // Call the server-side logout endpoint
             window.location.href = '/auth/logout';
         });
@@ -84,7 +112,7 @@
             const regularCandiesData = allCandies.filter(c => c.type === 'regular');
             displayCandies(regularCandiesData, 'regularCandies');
             const specialCandiesSection = document.getElementById('specialCandies');
-            if (userData && userData.member_level !== undefined && userData.member_name !== undefined) {
+            if (userData?.data?.member_level !== undefined) {
                 const specialCandiesData = allCandies.filter(c => c.type === 'special_club');
                 displayCandies(specialCandiesData, 'specialCandies');
                 specialCandiesSection.classList.remove('hidden');
