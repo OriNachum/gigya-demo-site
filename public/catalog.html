@@ -24,6 +24,10 @@
             <h2>Club Member Specials!</h2>
             <div class="candy-grid"></div>
         </div>
+        <div id="expertCandies" class="candy-catalog hidden">
+            <h2>Club Member Expert!</h2>
+            <div class="candy-grid"></div>
+        </div>
         <div id="group-info" class="group-info hidden">
             <p>You are logged in to group <span id="userGroup">XXX</span>.</p>
         </div>
@@ -112,12 +116,19 @@
             const regularCandiesData = allCandies.filter(c => c.type === 'regular');
             displayCandies(regularCandiesData, 'regularCandies');
             const specialCandiesSection = document.getElementById('specialCandies');
+            const expertCandiesSection = document.getElementById('expertCandies');
             if (userData?.data?.member_level !== undefined) {
                 const specialCandiesData = allCandies.filter(c => c.type === 'special_club');
                 displayCandies(specialCandiesData, 'specialCandies');
                 specialCandiesSection.classList.remove('hidden');
+                if (userData?.data?.member_expert === true) {
+                    const expertCandiesData = allCandies.filter(c => c.type === 'expert_club');
+                    displayCandies(expertCandiesData, 'expertCandies');
+                    expertCandiesSection.classList.remove('hidden');
+                }
             } else {
                 specialCandiesSection.classList.add('hidden');
+                expertCandiesSection.classList.add('hidden');
             }
         }
         function displayCandies(candies, containerId) {

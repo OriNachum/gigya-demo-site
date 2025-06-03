@@ -30,5 +30,21 @@
         "price": 7.25,
         "type": "special_club",
         "description": "A rich, dark chocolate truffle infused with a hint of exotic raspberry. A luxurious treat for our valued members."
+    },
+    {
+        "id": "e1",
+        "name": "Choco-Vino Fusion",
+        "imageUrl": "images/chocolate_wine_e1.jpg",
+        "price": 27.25,
+        "type": "expert_club",
+        "description": "Silky milk chocolate paired with a splash of fine wine, offering a sophisticated treat for expert palates."
+    },
+    {
+        "id": "e2",
+        "name": "Sommelier's Delight",
+        "imageUrl": "images/chocolate_wine_e2.jpg",
+        "price": 30.50,
+        "type": "expert_club",
+        "description": "A decadent dark chocolate truffle infused with a hint of vintage red wine, crafted for the true connoisseur."
     }
 ] 
