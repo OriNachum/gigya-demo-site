@@ -26,14 +26,40 @@
                 type: 'oidc',
                 iconURL: '/images/login_button.png'
             }];
-            
+
             gigya.accounts.showScreenSet({
                 screenSet: 'OIDC-RegistrationLogin',
                 containerID: 'loginContainer',
                 customButtons: oidcButton,
                 sessionExpiration: -1,
-                onError: function(eventObj) {
+                onError: function (eventObj) {
                     alert(`Login Error: ${eventObj.errorMessage || 'An unknown error occurred.'}`);
+                },
+                callback: function (response) {
+                    console.log('Gigya Response:', response);
+                }
+            });
+        }
+
+        //Workaround for the demo
+        async function showLoginScreenNoIcon() {
+            const response = await fetch('/api/client-config');
+            const config = await response.json();
+            const oidcButton = [{
+                opName: config.opProviderName,
+                type: 'oidc'
+            }];
+
+            gigya.accounts.showScreenSet({
+                screenSet: 'OIDC-RegistrationLogin',
+                containerID: 'loginContainer',
+                customButtons: oidcButton,
+                sessionExpiration: -1,
+                onError: function (eventObj) {
+                    alert(`Login Error: ${eventObj.errorMessage || 'An unknown error occurred.'}`);
+                },
+                callback: function (response) {
+                    console.log('Gigya Response:', response);
                 }
             });
         }
@@ -52,20 +78,20 @@
         function initializeLoginState() {
             if (!checkLogoutState()) {
                 // User was logged out, don't try to auto-login
-                return;
-            }
-
-            gigya.accounts.getAccountInfo({
-                callback: function(response) {
-                    if (response.errorCode === 0 && response.UID) {
-                        // User is already logged in
-                        handleLoginSuccess(response);
-                    } else {
-                        // User is not logged in, show login screen
-                        showLoginScreen();
+                showLoginScreenNoIcon();
+            } else {
+                gigya.accounts.getAccountInfo({
+                    callback: function (response) {
+                        if (response.errorCode === 0 && response.UID) {
+                            // User is already logged in
+                            handleLoginSuccess(response);
+                        } else {
+                            // User is not logged in, show login screen
+                            showLoginScreen();
+                        }
                     }
-                }
-            });
+                });
+            }
         }
 
         function handleLoginSuccess(response) {
@@ -77,13 +103,13 @@
             // const name = response?.profile?.firstName || response?.profile?.nickname || 'User';
             // document.getElementById('welcome-message').textContent = `Welcome, ${name}! 🎉`;
             // document.getElementById('welcome-message').style.display = 'block';
-            
+
             // // Show logout button
             // document.getElementById('logout-btn').style.display = 'inline-block';
-            
-            
+
+
             // catalog.style.display = 'block';
-            
+
             // Clear logged out state
             // localStorage.removeItem('loggedOut');
         }
@@ -96,5 +122,5 @@
             onLogin: handleLoginSuccess
         });
     </script>
-    </body>
+</body>
 </html> 

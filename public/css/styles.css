@@ -87,6 +87,7 @@ h2 {
 
 #welcome-message {
     display: none;
+    margin: inherit;
 }
 
 /* Logout Button Styles */
@@ -109,7 +110,7 @@ h2 {
 
 #logout-container {
     text-align: right;
-    margin-top: 20px;
+    margin-top: 0;
     margin-right: 20px;
 }
 
@@ -169,4 +170,6 @@ h2 {
 .group-info p {
     color: #333;
     margin-bottom: 0;
+    display: block;
+    text-align: left;
 }

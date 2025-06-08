@@ -80,10 +80,14 @@ app.get('/auth/callback', async (req, res) => {
 
 app.get('/auth/logout', (req, res) => {
     if (req.session) {
-        req.session.destroy(() => {});
+        req.session.destroy(() => {
+            res.clearCookie('connect.sid');
+            res.redirect('/login.html');
+        });
+    } else {
+        res.clearCookie('connect.sid');
+        res.redirect('/login.html');
     }
-    res.clearCookie('connect.sid');
-    res.redirect('/login.html');
 });
 
 // --- Basic Routes for HTML pages ---

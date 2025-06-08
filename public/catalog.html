@@ -10,6 +10,9 @@
 <body>
     <h2 id="welcome-message">Welcome!</h2>
     <div id="logout-container">
+        <div id="group-info" class="group-info hidden">
+            <p>You are logged in to group <span id="userGroup">XXX</span>.</p>
+        </div>
         <button id="show-my-profile-btn" class="show-my-profile-btn">Show My Profile</button>
         <button id="hide-my-profile-btn" class="hide-my-profile-btn" >Hide My Profile</button>
         <button id="logout-btn" class="logout-btn">Logout</button>
@@ -27,9 +30,6 @@
         <div id="expertCandies" class="candy-catalog hidden">
             <h2>Club Member Expert!</h2>
             <div class="candy-grid"></div>
-        </div>
-        <div id="group-info" class="group-info hidden">
-            <p>You are logged in to group <span id="userGroup">XXX</span>.</p>
         </div>
     </div>
     <script>
@@ -56,7 +56,7 @@
         window.addEventListener("group_name_message", (event) => {
             const userData = JSON.parse(sessionStorage.getItem("response"));
             const name = userData?.profile?.firstName || userData?.profile?.nickname || 'User';
-            const group = userData?.group || 'Unknown'; // Replace 'group' with the actual key for group info in userData
+            const group = userData?.group || 'Unknown';
 
             document.getElementById('welcome-message').textContent = `Welcome, ${name}! 🎉`;
             document.getElementById('welcome-message').style.display = 'block';
@@ -121,7 +121,7 @@
                 const specialCandiesData = allCandies.filter(c => c.type === 'special_club');
                 displayCandies(specialCandiesData, 'specialCandies');
                 specialCandiesSection.classList.remove('hidden');
-                if (userData?.data?.member_expert === true) {
+                if (userData?.data?.member_expert !== undefined && userData?.data?.member_expert[0] === 'True') {
                     const expertCandiesData = allCandies.filter(c => c.type === 'expert_club');
                     displayCandies(expertCandiesData, 'expertCandies');
                     expertCandiesSection.classList.remove('hidden');
