@@ -5,6 +5,7 @@
     <title>Consent - Vikis Sweets Shop</title>
     <link rel="stylesheet" href="/css/consent.css">
     <script type="text/javascript" lang="javascript" src="https://cdns.us1-st2.gigya.com/JS/gigya.js?apiKey=4_BBh5A7KRDVpfvcI23Dd1yg"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
     <script>
         function base64UrlEncode(input) {
             return btoa(input).replace(/=/g, "")  // Remove padding
@@ -17,13 +18,21 @@
             const consentData = {
                 clientID: urlParams.get("clientID"),
                 context: urlParams.get("context"),
-                scope: urlParams.get("scope") ? urlParams.get("scope").split(" ") : [],
+                scope: urlParams.get("scope") ? urlParams.get("scope").replace(/\+/g, ' ') : [],
                 UID: urlParams.get("UID"),
                 consent: approved            
-            };           // **⚠️ WARNING: Fake Signature - Do NOT use in production**
-            const fakeSecret = "your_fake_secret_key"; // Fake, do NOT use real secret here!
+            };
             const consentString = JSON.stringify(consentData);
-            const signature = base64UrlEncode(fakeSecret + consentString); // Simulated signature
+            const partnerSecret = "1t9Vav4p4n1gOfQhiyP/Z0lvh4aKp0n0TV4a0wkP970=";
+            const secret = CryptoJS.enc.Base64.parse(partnerSecret)
+            const signature = CryptoJS
+                .HmacSHA1(consentString, secret)
+                .toString(CryptoJS.enc.Base64)
+                .replace(/=+$/, '')
+                .replace(/\+/g, '-')
+                .replace(/\//g, '_');
+            
+            
             
             // Redirect to proxy page
             redirectToProxy(consentString, signature); 
