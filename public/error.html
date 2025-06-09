@@ -1,0 +1,20 @@
+<html>
+<head>
+    <title>Error</title>
+    <script type="text/javascript" lang="javascript" src="https://cdns.gigya.com/JS/gigya.js?apiKey=4_BBh5A7KRDVpfvcI23Dd1yg"></script>
+</head>
+<body>
+<div class="responseDiv" id="responseDiv" style="width: 50%; height: 50%; overflow: auto; text-align: left; margin: 0px auto;">
+</div>
+<h1>Error</h1>
+<script>   
+    thisUri = window.location.href;    
+    decodedUri = decodeURIComponent(thisUri);    
+    decodedUri = decodedUri.replace("error.html?", "");  
+    decodedUri = decodedUri.replace(/,/g, ", &nbsp;&nbsp;&nbsp;&nbsp;");   
+    decodedUri = decodedUri.replace(/{/g, "{ &nbsp;&nbsp;&nbsp;&nbsp;");   
+    decodedUri = decodedUri.replace(/}/g, "}");   
+    document.getElementById('responseDiv').innerHTML = decodedUri;
+</script>
+<!--<button id="logoutBtn" onClick="redirectToRP()" style="display:none">RP initiated logout</button></body>-->
+</html>

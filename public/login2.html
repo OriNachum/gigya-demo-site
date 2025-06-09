@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Vikis Sweets Shop</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <script type="text/javascript" src="https://cdns.us1-st2.gigya.com/js/gigya.js?apiKey=4_BBh5A7KRDVpfvcI23Dd1yg"></script>
+</head>
+<body>
+    <header>
+        <h1>Vikis Sweets Shop</h1>
+    </header>
+    <div id="container">
+        <h2>Login or Register</h2>
+        <div id="loginContainer1">
+            <p>Loading login options...</p>
+        </div>
+    </div>
+    <script>
+        async function showLoginScreen() {
+            try {
+                // console.log("showLoginScreen called");
+                // const response = await fetch('/api/client-config');
+                // const config = await response.json();
+                console.log("calling showScreenSet");
+                gigya.accounts.showScreenSet({
+                    screenSet: 'Default-RegistrationLogin',
+                    containerID: 'loginContainer1',
+                    sessionExpiration: -1,
+                    
+                    onError: function(eventObj) {
+                        alert(`Login Error: ${eventObj.errorMessage || 'An unknown error occurred.'}`);
+                    }
+                });
+            }
+            catch (e) {
+                console.error('Error loading login screen:', e);
+            }
+        }
+
+        function redirectToProxy() {
+            var url = gigya.utils.URL.addParamsToURL("proxy.html",{
+                mode: 'afterLogin'
+            });
+            window.location.href = url;
+        }
+        
+        gigya.socialize.addEventHandlers({
+            onLogin: function() {
+                redirectToProxy();
+            }
+        });
+
+        showLoginScreen();
+    </script>
+    </body>
+</html> 

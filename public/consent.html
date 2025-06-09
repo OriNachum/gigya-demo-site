@@ -1,0 +1,66 @@
+<!DOCTYPE html><html lang="en">
+<head>    
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consent - Vikis Sweets Shop</title>
+    <link rel="stylesheet" href="/css/consent.css">
+    <script type="text/javascript" lang="javascript" src="https://cdns.us1-st2.gigya.com/JS/gigya.js?apiKey=4_BBh5A7KRDVpfvcI23Dd1yg"></script>
+    <script>
+        function base64UrlEncode(input) {
+            return btoa(input).replace(/=/g, "")  // Remove padding
+                .replace(/\+/g, "-") // Convert '+' to '-'
+                .replace(/\//g, "_"); // Convert '/' to '_' 
+        }        
+        
+        async function handleConsent(approved) {
+            const urlParams = new URLSearchParams(window.location.search);
+            const consentData = {
+                clientID: urlParams.get("clientID"),
+                context: urlParams.get("context"),
+                scope: urlParams.get("scope") ? urlParams.get("scope").split(" ") : [],
+                UID: urlParams.get("UID"),
+                consent: approved            
+            };           // **⚠️ WARNING: Fake Signature - Do NOT use in production**
+            const fakeSecret = "your_fake_secret_key"; // Fake, do NOT use real secret here!
+            const consentString = JSON.stringify(consentData);
+            const signature = base64UrlEncode(fakeSecret + consentString); // Simulated signature
+            
+            // Redirect to proxy page
+            redirectToProxy(consentString, signature); 
+        }
+
+        function redirectToProxy(consentString, signature) {
+            var url = gigya.utils.URL.addParamsToURL("proxy.html",{
+                mode: 'afterConsent',
+                consent: consentString,
+                sig: encodeURIComponent(signature)
+            });
+            window.location.href = url;
+        }
+        function loadConsentDetails() {            
+            const urlParams = new URLSearchParams(window.location.search);     
+            document.getElementById("clientID").textContent = urlParams.get("clientID") || "Unknown";
+            document.getElementById("UID").textContent = urlParams.get("UID") || "Unknown";
+            const scopes = urlParams.get("scope") ? urlParams.get("scope").split(" ") : [];
+            const scopesList = document.getElementById("scopesList");        
+            scopes.forEach(scope => {         
+                const li = document.createElement("li");        
+                li.textContent = scope;            
+                scopesList.appendChild(li);         
+            });     
+        }     
+        window.onload = loadConsentDetails;   
+    </script>
+</head>
+<body>
+    <header>
+        <h1>Vikis Sweets Shop</h1>
+    </header>
+    <h1>Consent Page</h1>
+    <p>The application <b id="clientID"></b> is requesting access to:</p>
+    <ul id="scopesList"></ul>
+    <p>For user <b id="UID"></b></p>
+    <button onclick="handleConsent(true)">Approve</button>
+    <button onclick="handleConsent(false)">Deny</button>
+</body>
+</html>
