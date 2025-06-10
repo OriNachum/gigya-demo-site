@@ -28,6 +28,7 @@
                     screenSet: 'Default-RegistrationLogin',
                     containerID: 'loginContainer1',
                     sessionExpiration: -2,
+                    authFlow: "redirect",
                     callback: function (response) {
                         console.log("Gigya Login Response:", response);
                         if (response.errorCode === 0 && response.UID) {
