@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Vikis Sweets Shop</title>
     <link rel="stylesheet" href="/css/styles.css">
-    <script type="text/javascript" src="https://cdns.us1.gigya.com/js/gigya.js?apiKey=4_4qEhi-moqNMXf6PUHjjw-g"></script>
+    <script type="text/javascript" src="https://cdns.us1-st2.gigya.com/js/gigya.js?apiKey=4_4qEhi-moqNMXf6PUHjjw-g"></script>
 </head>
 <body>
     <header>
@@ -31,12 +31,15 @@
                 screenSet: 'OIDC-RegistrationLogin',
                 containerID: 'loginContainer',
                 customButtons: oidcButton,
-                sessionExpiration: -1,
-                onError: function (eventObj) {
-                    alert(`Login Error: ${eventObj.errorMessage || 'An unknown error occurred.'}`);
-                },
+                sessionExpiration: -2,
+                authFlow: "redirect",
                 callback: function (response) {
-                    console.log('Gigya Response:', response);
+                    console.log("Gigya Login Response:", response);
+                    if (response.errorCode === 0 && response.UID) {
+                        handleLoginSuccess(response);
+                    } else {
+                        console.error("Login failed or user not logged in:", response);
+                    }
                 }
             });
         }
@@ -76,12 +79,16 @@
 
         // Check login status first if not logged out
         function initializeLoginState() {
+            console.log("Initializing Gigya login state check...");
             if (!checkLogoutState()) {
+                console.log("User was logged out, showing login screen without icon.");
                 // User was logged out, don't try to auto-login
                 showLoginScreenNoIcon();
             } else {
+                console.log("Checking if user is already logged in...");
                 gigya.accounts.getAccountInfo({
                     callback: function (response) {
+                        console.log(response.errorCode, response.UID, response.callId, JSON.stringify(response));
                         if (response.errorCode === 0 && response.UID) {
                             // User is already logged in
                             handleLoginSuccess(response);
@@ -113,14 +120,41 @@
             // Clear logged out state
             // localStorage.removeItem('loggedOut');
         }
+        // Add event handlers for login events
+        // gigya.socialize.addEventHandlers({
+        //     onLogin: handleLoginSuccess
+        // });
 
+        // Make initializeGigya globally available
+        window.initializeGigya = function() {
+            // Register the onLogin event handler (for login page)
+            if (typeof gigya !== "undefined" && gigya.socialize && document.querySelector('.login-card')) {
+                gigya.socialize.addEventHandlers({
+                    onLogin: afterLogin
+                });
+            }
+            // Always call getMemberGroups on page load
+            // getMemberGroups(showGroupsResponse);
+
+            // Define afterLogin only once
+            async function afterLogin(loginResponseInfo) {
+                sessionStorage.setItem("response", JSON.stringify(loginResponseInfo));
+                console.log("Login Response:", loginResponseInfo);
+                if (loginResponseInfo.errorCode > 0) {
+                    alert("Your login attempt failed with error: " + loginResponseInfo.errorCode);
+                    return;
+                }
+                var accountInfo = await getAccountInfo();
+                console.log("Account Info:", accountInfo);
+                if (accountInfo.errorCode === 0) {
+                    window.location = `catalog.html`;
+                }
+            }
+        }
+        
         // Initialize login state check
         initializeLoginState();
-
-        // Add event handlers for login events
-        gigya.accounts.addEventHandlers({
-            onLogin: handleLoginSuccess
-        });
+        
     </script>
 </body>
 </html> 

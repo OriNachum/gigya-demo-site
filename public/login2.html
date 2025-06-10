@@ -27,8 +27,15 @@
                 gigya.accounts.showScreenSet({
                     screenSet: 'Default-RegistrationLogin',
                     containerID: 'loginContainer1',
-                    sessionExpiration: -1,
-                    
+                    sessionExpiration: -2,
+                    callback: function (response) {
+                        console.log("Gigya Login Response:", response);
+                        if (response.errorCode === 0 && response.UID) {
+                            handleLoginSuccess(response);
+                        } else {
+                            console.error("Login failed or user not logged in:", response);
+                        }
+                    },
                     onError: function(eventObj) {
                         alert(`Login Error: ${eventObj.errorMessage || 'An unknown error occurred.'}`);
                     }

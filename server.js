@@ -4,9 +4,17 @@ const express = require('express');
 const path = require('path');
 const axios = require('axios');
 const session = require('express-session');
+const https = require('https');
+const fs = require('fs');
 
 const app = express();
-const port = process.env.PORT || 3000;
+const port = 443;
+
+// Load SSL/TLS certificate and private key
+const sslOptions = {
+    key: fs.readFileSync(path.join(__dirname, 'server.key')),
+    cert: fs.readFileSync(path.join(__dirname, 'server.cert'))
+};
 
 // Middleware
 app.use(express.json());
@@ -19,7 +27,7 @@ app.use(session({
     resave: false,
     saveUninitialized: true,
     cookie: {
-        secure: process.env.NODE_ENV === 'production',
+        secure: true, // Ensure cookies are only sent over HTTPS
         httpOnly: true,
         sameSite: 'lax'
     }
@@ -100,10 +108,10 @@ app.get('/catalog.html', (req, res) => {
 });
 
 app.get('/', (req, res) => {
-    res.redirect('/login.html');
+    res.redirect('/homepage.html');
 });
 
-// --- Start Server ---
-app.listen(port, () => {
-    console.log(`Vikis Sweets Shop listening at http://localhost:${port}`);
-}); 
+// --- Start HTTPS Server ---
+https.createServer(sslOptions, app).listen(port, () => {
+    console.log(`Vikis Sweets Shop listening securely at https://localhost:${port}`);
+});

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vikis Sweets Shop</title>
+</head>
+<body>
+<div id="content">
+    <p>Loading...</p>
+</div>
+<script>
+    // Function to check if the user is logged in
+    function isLoggedIn() {
+        const userData = sessionStorage.getItem("response");
+        return userData !== null;
+    }
+
+    // Function to load the appropriate page
+    function loadPage() {
+        const contentDiv = document.getElementById("content");
+        if (isLoggedIn()) {
+            // User is logged in, load catalog.html
+            window.location.href = "catalog.html";
+        } else {
+            // User is not logged in, load login.html
+            window.location.href = "login.html";
+        }
+    }
+
+    // Execute the page load logic
+    loadPage();
+</script>
+</body>
+</html>
