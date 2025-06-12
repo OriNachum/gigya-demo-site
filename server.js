@@ -12,9 +12,20 @@ const port = 443;
 
 // Load SSL/TLS certificate and private key
 const sslOptions = {
-    key: fs.readFileSync(path.join(__dirname, 'server.key')),
-    cert: fs.readFileSync(path.join(__dirname, 'server.cert'))
+    key: fs.readFileSync(path.join(__dirname, 'certs', 'server.key')),
+    cert: fs.readFileSync(path.join(__dirname, 'certs', 'server.cert'))
 };
+//
+// const certificates = {
+//     'rp.com': {
+//         key: fs.readFileSync(path.join(__dirname, 'certs', 'rp.key')),
+//         cert: fs.readFileSync(path.join(__dirname, 'certs', 'rp.cert'))
+//     },
+//     'op.com': {
+//         key: fs.readFileSync(path.join(__dirname, 'certs', 'op.com.key')),
+//         cert: fs.readFileSync(path.join(__dirname, 'certs', 'op.com.cert'))
+//     }
+// };
 
 // Middleware
 app.use(express.json());
@@ -106,9 +117,21 @@ app.get('/login.html', (req, res) => {
 app.get('/catalog.html', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'catalog.html'));
 });
+//
+// // Create HTTPS server with SNI support
+// const server = https.createServer({
+//     SNICallback: (domain, callback) => {
+//         const cert = certificates[domain];
+//         if (cert) {
+//             callback(null, https.createSecureContext(cert));
+//         } else {
+//             callback(new Error('No certificate found for domain'));
+//         }
+//     }
+// }, app);
 
 app.get('/', (req, res) => {
-    res.redirect('/homepage.html');
+    res.redirect('/login.html');
 });
 
 // --- Start HTTPS Server ---

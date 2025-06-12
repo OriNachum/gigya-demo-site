@@ -31,10 +31,11 @@
                 screenSet: 'OIDC-RegistrationLogin',
                 containerID: 'loginContainer',
                 customButtons: oidcButton,
-                sessionExpiration: -2,
+                sessionExpiration: 0,
                 authFlow: "redirect",
                 callback: function (response) {
                     console.log("Gigya Login Response:", response);
+                    localStorage.removeItem('loggedOut');
                     if (response.errorCode === 0 && response.UID) {
                         handleLoginSuccess(response);
                     } else {
@@ -57,12 +58,19 @@
                 screenSet: 'OIDC-RegistrationLogin',
                 containerID: 'loginContainer',
                 customButtons: oidcButton,
-                sessionExpiration: -1,
+                sessionExpiration: 0,
+                authFlow: "redirect",
                 onError: function (eventObj) {
                     alert(`Login Error: ${eventObj.errorMessage || 'An unknown error occurred.'}`);
                 },
                 callback: function (response) {
-                    console.log('Gigya Response:', response);
+                    console.log("Gigya Login Response:", response);
+                    localStorage.removeItem('loggedOut');
+                    if (response.errorCode === 0 && response.UID) {
+                        handleLoginSuccess(response);
+                    } else {
+                        console.error("Login failed or user not logged in:", response);
+                    }
                 }
             });
         }
@@ -72,20 +80,20 @@
             const wasLoggedOut = localStorage.getItem('loggedOut') === 'true';
             if (wasLoggedOut) {
                 // User has been logged out, no need to check login status
-                return false;
+                return true;
             }
-            return true;
+            return false;
         }
 
         // Check login status first if not logged out
         function initializeLoginState() {
             console.log("Initializing Gigya login state check...");
-            if (!checkLogoutState()) {
+            if (checkLogoutState()) {
+                localStorage.removeItem('loggedOut');
                 console.log("User was logged out, showing login screen without icon.");
                 // User was logged out, don't try to auto-login
                 showLoginScreenNoIcon();
             } else {
-                console.log("Checking if user is already logged in...");
                 gigya.accounts.getAccountInfo({
                     callback: function (response) {
                         console.log(response.errorCode, response.UID, response.callId, JSON.stringify(response));
@@ -103,27 +111,11 @@
 
         function handleLoginSuccess(response) {
             //document.contentWindow.postMessage(response, "*"); // Replace * with target origin if possible
+            console.log("Removing loggedOut")
+            localStorage.removeItem('loggedOut');
             sessionStorage.setItem("response", JSON.stringify(response));
             window.location.href = 'catalog.html';
-            // document.getElementById('container').style.display = 'none';
-            // document.getElementById('loginContainer').style.display = 'none';
-            // const name = response?.profile?.firstName || response?.profile?.nickname || 'User';
-            // document.getElementById('welcome-message').textContent = `Welcome, ${name}! 🎉`;
-            // document.getElementById('welcome-message').style.display = 'block';
-
-            // // Show logout button
-            // document.getElementById('logout-btn').style.display = 'inline-block';
-
-
-            // catalog.style.display = 'block';
-
-            // Clear logged out state
-            // localStorage.removeItem('loggedOut');
         }
-        // Add event handlers for login events
-        // gigya.socialize.addEventHandlers({
-        //     onLogin: handleLoginSuccess
-        // });
 
         // Make initializeGigya globally available
         window.initializeGigya = function() {
@@ -133,11 +125,10 @@
                     onLogin: afterLogin
                 });
             }
-            // Always call getMemberGroups on page load
-            // getMemberGroups(showGroupsResponse);
 
             // Define afterLogin only once
             async function afterLogin(loginResponseInfo) {
+                localStorage.removeItem('loggedOut');
                 sessionStorage.setItem("response", JSON.stringify(loginResponseInfo));
                 console.log("Login Response:", loginResponseInfo);
                 if (loginResponseInfo.errorCode > 0) {

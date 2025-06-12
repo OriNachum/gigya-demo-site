@@ -103,6 +103,7 @@
         // Setup logout button click handler
         document.getElementById('logout-btn').addEventListener('click', function() {
             // Set logged out flag in localStorage
+            console.log("Setting loggedOut")
             localStorage.setItem('loggedOut', 'true');
             sessionStorage.clear();
             
