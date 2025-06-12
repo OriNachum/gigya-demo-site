@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Groups - Vikis Sweets Shop</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <script type="text/javascript" src="https://cdns.us1-st2.gigya.com/js/gigya.js?apiKey=4_BBh5A7KRDVpfvcI23Dd1yg"></script>
+</head>
+<body>
+<header>
+    <h1>Vikis Sweets Shop</h1>
+</header>
+<h1>Groups</h1>
+<div id="groups-container">
+    <p>Loading groups...</p>
+</div>
+<button id="continue-btn" style="display: none;">Continue</button>
+
+<script>
+    function getAllMemberGroups() {
+        try {
+            // Step 1: Get member groups
+            gigya.accounts.groups.getAllMemberGroups({
+                callback: function(groupsResponse) {
+                    if (groupsResponse.errorCode === 0) {
+                        console.log("Member Groups:", groupsResponse);
+                        var groups = groupsResponse.results;
+                        getContextData(groups)
+                    } else {
+                        console.error("Error fetching member groups:", groupsResponse.errorMessage);
+                    }
+                }
+            });
+        } catch (error) {
+            console.error("Error in fetchGroupsAndContext:", error);
+            return null;
+        }
+    }
+
+    function getSelectedGroup(model) {
+        var groupId;
+        try {
+            // Step 1: Get member groups
+            gigya.accounts.session.groups.get({
+                model: model,
+                callback: function(sessionResponse) {
+                    if (sessionResponse.errorCode === 0) {
+                        console.log("Selected Groups:", sessionResponse);
+                        if(sessionResponse.groupId)
+                        {
+                            groupId = sessionResponse.groupId;
+                            console.log("No groups found for the selected model:", model);
+                        }
+                    } else {
+                        console.error("Error fetching selected groups:", sessionResponse.errorMessage);
+                    }
+                }
+            });
+            return groupId;
+        } catch (error) {
+            console.error("Error in fetchGroupsAndContext:", error);
+            return null;
+        }
+    }
+
+    // function displayGroups(groups) {
+    //     const container = document.getElementById("groups-container");
+    //     container.innerHTML = "<h2>Your Groups:</h2>";
+    //     if (groups && groups.length > 0) {
+    //         groups.forEach(group => {
+    //             const groupDiv = document.createElement("div");
+    //             groupDiv.textContent = `Group Name: ${group.groupId}`;
+    //             container.appendChild(groupDiv);
+    //         });
+    //     } else {
+    //         container.innerHTML += "<p>No groups found.</p>";
+    //     }
+    // }
+
+    function getContextData(groups) {
+        // Step 2: Get context data
+        gigya.fidm.oidc.op.getContextData({
+            callback: function(contextResponse) {
+                if (contextResponse.errorCode === 0) {
+                    console.log("Context Data:", contextResponse);
+                    const mappedModels = contextResponse.memberships?.mapped_models || [];
+                    console.log("Mapped Models:", mappedModels);
+                    mappedModels.split(',').forEach(model => {
+                        console.log("Mapped Model:", model);
+                        var groupId = getSelectedGroup(model);
+                        if(groupId!== undefined)
+                        {
+                            console.log("Group ID for model", model, ":", groupId);
+                        } else {
+                            // Create a dropdown for optional group IDs
+                            const dropdown = document.createElement("select");
+                            dropdown.id = `dropdown-${model}`;
+                            const defaultOption = document.createElement("option");
+                            defaultOption.value = '';
+                            defaultOption.textContent = `Select a group`;
+                            dropdown.appendChild(defaultOption);
+
+                            groups.forEach(group => {
+                                if (group.model === model) {
+                                    const option = document.createElement("option");
+                                    option.value = group.groupId;
+                                    option.textContent = `${group.groupId}`;
+                                    dropdown.appendChild(option);
+                                }
+                            });
+
+                            if (dropdown.options.length > 1) {
+                                // Add a label above the dropdown
+                                const label = document.createElement("label");
+                                label.htmlFor = dropdown.id;
+                                label.textContent = `Please select a group in model ${model}:`;
+
+                                // Append the label and dropdown to the container
+                                const container = document.getElementById("groups-container");
+                                container.appendChild(label);
+                                container.appendChild(dropdown);
+                                var selectedGroupId = defaultOption.value
+                                dropdown.addEventListener("change", (event) => {
+                                    console.log("event:", event);
+                                    selectedGroupId = event.target.value; // Get the selected value
+                                    console.log("Selected Group ID:", selectedGroupId);
+                                    setupContinueButton(model, selectedGroupId); // Pass the updated value
+                                    
+                                });
+                                
+                            } else {
+                                console.log("No optional group IDs found for model", model);
+                            }
+                        }
+                    });
+                    
+                } else {
+                    console.error("Error fetching context data:", contextResponse.errorMessage);
+                }
+            }
+        });
+    }
+
+    function setupContinueButton(model,groupId) {
+        const continueBtn = document.getElementById("continue-btn");
+        continueBtn.style.display = "block";
+        continueBtn.addEventListener("click", (event) => {
+            // Step 4: Set session groups for each model
+                gigya.accounts.session.groups.set({
+                    model: model,
+                    groupId: groupId,
+                    callback: function(response) {
+                        if (response.errorCode === 0) {
+                            console.log(`Session set for group: ${groupId}`, response);
+                            redirectToProxy();
+                        } else {
+                            console.error(`Error setting session for group: ${groupId}`, response);
+                        }
+                    }
+                });
+            alert("Session groups set successfully!");
+        });
+    }
+
+    function redirectToProxy() {
+        var url = gigya.utils.URL.addParamsToURL("proxy.html",{
+            mode: 'afterGroups'
+        });
+        window.location.href = url;
+    }
+    
+    function initializeGroupsSelection()
+    {
+        getAllMemberGroups();
+    }
+
+    // Initialize the flow
+    initializeGroupsSelection()
+    
+</script>
+</body>
+</html>
