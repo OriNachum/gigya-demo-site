@@ -14,7 +14,7 @@
             <p>You are logged in to group <span id="userGroup">XXX</span>.</p>
         </div>
         <button id="show-my-profile-btn" class="show-my-profile-btn">Show My Profile</button>
-        <button id="hide-my-profile-btn" class="hide-my-profile-btn" >Hide My Profile</button>
+        <button id="show-my-org-btn" class="show-my-profile-btn" >Show My Organization</button>
         <button id="logout-btn" class="logout-btn">Logout</button>
     </div>
     <div id="user-profile"></div>
@@ -75,29 +75,26 @@
         const showProfileBtn = document.getElementById("show-my-profile-btn");
 
         showProfileBtn.addEventListener("click", () => {
-            const userData = JSON.parse(sessionStorage.getItem("response"));
-            const name = userData?.profile?.firstName || userData?.profile?.nickname || 'Unknown';
-            const gender = userData?.profile?.gender || 'Unknown';
-            const memberLevel = userData?.data?.member_level || 'Unknown';
-            const userProfileDiv = document.getElementById("user-profile");
-            userProfileDiv.innerHTML = `
-            <h2>👤 User Profile</h2>
-            <strong>Name:</strong> ${name}<br>
-            <strong>Gender:</strong> ${gender}<br>
-            <strong>Level:</strong> ${memberLevel}
-      `;
-            userProfileDiv.style.display = "block";
-            document.getElementById('show-my-profile-btn').style.display = 'none';
-            document.getElementById('hide-my-profile-btn').style.display = 'inline-block';
+            gigya.accounts.showScreenSet({
+                screenSet: "OIDC-ProfileUpdate",
+                containerID: null, // No container, as it will open in a new window
+                callback: function() {
+                    console.log("Profile Info ScreenSet loaded.");
+                }
+            });
+
         });
 
-        const hideProfileBtn = document.getElementById("hide-my-profile-btn");
+        const showOrgBtn = document.getElementById("show-my-org-btn");
 
-        hideProfileBtn.addEventListener("click", () => {
-            const userProfileDiv = document.getElementById("user-profile");
-            userProfileDiv.style.display = "none";
-            document.getElementById('show-my-profile-btn').style.display = 'inline-block';
-            document.getElementById('hide-my-profile-btn').style.display = 'none';
+        showOrgBtn.addEventListener("click", () => {
+            gigya.accounts.showScreenSet({
+                screenSet: "OrganizationInfo-ProfileUpdate",
+                containerID: null, // No container, as it will open in a new window
+                callback: function() {
+                    console.log("Organization Info ScreenSet loaded.");
+                }
+            });
         });
 
         // Setup logout button click handler

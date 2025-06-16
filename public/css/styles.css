@@ -173,3 +173,62 @@ h2 {
     display: block;
     text-align: left;
 }
+
+/* Style for the dropdown */
+.styled-dropdown {
+    width: 100%;
+    max-width: 400px;
+    padding: 5px;
+    font-size: 16px;
+    border: 2px solid #ff9933;
+    border-radius: 5px;
+    background-color: #fff;
+    color: #333;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+}
+
+/* Style for the dropdown options */
+.styled-dropdown option {
+    padding: 10px;
+    font-size: 16px;
+    background-color: #fff;
+    color: #333;
+}
+
+/* Add hover effect */
+.styled-dropdown:hover {
+    border-color: #ff4b3a; /* Darker shade for hover */
+}
+
+/* Add focus effect */
+.styled-dropdown:focus {
+    outline: none;
+    border-color: #ff4b3a;
+    box-shadow: 0 0 5px rgba(255, 75, 58, 0.5);
+}
+
+/* Continue Button Styles */
+.continue-btn {
+    background-color: #ffb366;
+    color: #4a3b31;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.2s ease;
+    margin-top: 60px;
+    display: block;
+    align-self: center;
+    width: 300px;
+}
+
+.continue:hover {
+    background-color: #ff9933;
+}
+
+.dropdown-label {
+    width: 350px;
+    display: inline-block;
+}

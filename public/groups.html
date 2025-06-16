@@ -11,18 +11,26 @@
 <header>
     <h1>Vikis Sweets Shop</h1>
 </header>
-<h1>Groups</h1>
+<h1>Select your sweet groups</h1>
 <div id="groups-container">
-    <p>Loading groups...</p>
 </div>
-<button id="continue-btn" style="display: none;">Continue</button>
+<button id="continue-btn" class="continue-btn">Continue</button>
 
 <script>
     function getAllMemberGroups() {
         try {
+            const container = document.getElementById("groups-container");
+            const loadingMessage = document.createElement("p");
+            loadingMessage.textContent = "Loading groups...";
+            loadingMessage.id = "loading-message"; // Add an ID for easy removal
+            container.appendChild(loadingMessage);
             // Step 1: Get member groups
             gigya.accounts.groups.getAllMemberGroups({
                 callback: function(groupsResponse) {
+                    const loadingElement = document.getElementById("loading-message");
+                    if (loadingElement) {
+                        container.removeChild(loadingElement);
+                    }
                     if (groupsResponse.errorCode === 0) {
                         console.log("Member Groups:", groupsResponse);
                         var groups = groupsResponse.results;
@@ -82,6 +90,7 @@
         // Step 2: Get context data
         gigya.fidm.oidc.op.getContextData({
             callback: function(contextResponse) {
+                shouldSkipGroupsSelection = true;
                 if (contextResponse.errorCode === 0) {
                     console.log("Context Data:", contextResponse);
                     const mappedModels = contextResponse.memberships?.mapped_models || [];
@@ -93,9 +102,14 @@
                         {
                             console.log("Group ID for model", model, ":", groupId);
                         } else {
+                            shouldSkipGroupsSelection = false
                             // Create a dropdown for optional group IDs
                             const dropdown = document.createElement("select");
+                            // Add a class to the dropdown for styling
+                            dropdown.classList.add("styled-dropdown");
                             dropdown.id = `dropdown-${model}`;
+                            console.log("Creating dropdown for model:", model);
+                            
                             const defaultOption = document.createElement("option");
                             defaultOption.value = '';
                             defaultOption.textContent = `Select a group`;
@@ -113,21 +127,30 @@
                             if (dropdown.options.length > 1) {
                                 // Add a label above the dropdown
                                 const label = document.createElement("label");
+                                label.classList.add("dropdown-label");
                                 label.htmlFor = dropdown.id;
-                                label.textContent = `Please select a group in model ${model}:`;
+                                label.textContent = `Please select a group in model ${model}: `;
 
                                 // Append the label and dropdown to the container
                                 const container = document.getElementById("groups-container");
-                                container.appendChild(label);
-                                container.appendChild(dropdown);
-                                var selectedGroupId = defaultOption.value
+                                const dropdownContainer = document.createElement("div");
+                                dropdownContainer.style.marginBottom = "15px"; // Add spacing between dropdowns
+                                dropdownContainer.appendChild(label);
+                                dropdownContainer.appendChild(dropdown);
+                                container.appendChild(dropdownContainer);
+                                // Update selectedGroups object when a dropdown value changes
                                 dropdown.addEventListener("change", (event) => {
-                                    console.log("event:", event);
-                                    selectedGroupId = event.target.value; // Get the selected value
-                                    console.log("Selected Group ID:", selectedGroupId);
-                                    setupContinueButton(model, selectedGroupId); // Pass the updated value
-                                    
+                                    selectedGroups[model] = event.target.value; // Store the selected group ID for the model
+                                    console.log("Updated selected groups:", selectedGroups);
                                 });
+                                // var selectedGroupId = defaultOption.value
+                                // dropdown.addEventListener("change", (event) => {
+                                //     console.log("event:", event);
+                                //     selectedGroupId = event.target.value; // Get the selected value
+                                //     console.log("Selected Group ID:", selectedGroupId);
+                                    
+                                //    
+                                // });
                                 
                             } else {
                                 console.log("No optional group IDs found for model", model);
@@ -138,28 +161,37 @@
                 } else {
                     console.error("Error fetching context data:", contextResponse.errorMessage);
                 }
+                if(shouldSkipGroupsSelection)
+                {
+                    redirectToProxy();
+                }
+                else
+                {
+                    setupContinueButton(); // Pass the updated value
+                }
             }
         });
     }
 
-    function setupContinueButton(model,groupId) {
+    function setupContinueButton() {
         const continueBtn = document.getElementById("continue-btn");
-        continueBtn.style.display = "block";
-        continueBtn.addEventListener("click", (event) => {
-            // Step 4: Set session groups for each model
+        continueBtn.addEventListener("click", () => {
+            console.log("Continue button click handler. selectedGroups:" + selectedGroups);
+            // Iterate through selected models and groups
+            Object.entries(selectedGroups).forEach(([model, groupId]) => {
                 gigya.accounts.session.groups.set({
                     model: model,
                     groupId: groupId,
-                    callback: function(response) {
+                    callback: function (response) {
                         if (response.errorCode === 0) {
-                            console.log(`Session set for group: ${groupId}`, response);
-                            redirectToProxy();
+                            console.log(`Session set for model: ${model}, group: ${groupId}`, response);
                         } else {
-                            console.error(`Error setting session for group: ${groupId}`, response);
+                            console.error(`Error setting session for model: ${model}, group: ${groupId}`, response);
                         }
                     }
                 });
-            alert("Session groups set successfully!");
+            });
+            redirectToProxy();
         });
     }
 
@@ -174,9 +206,9 @@
     {
         getAllMemberGroups();
     }
-
+    const selectedGroups = {}; // Object to store selected models and group IDs
     // Initialize the flow
-    initializeGroupsSelection()
+    initializeGroupsSelection();
     
 </script>
 </body>
