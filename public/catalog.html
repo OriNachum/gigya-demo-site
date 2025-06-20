@@ -37,12 +37,16 @@
         window.addEventListener("message", (event) => {
             const userData = JSON.parse(sessionStorage.getItem("response"));
             console.log(JSON.stringify(userData));
+            if(userData?.data?.organization_name === undefined)
+            {
+                document.getElementById('show-my-org-btn').style.display = 'none';
+            }
             const name = userData?.profile?.firstName || userData?.profile?.nickname || 'User';
             document.getElementById('welcome-message').textContent = `Welcome, ${name}! 🎉`;
             document.getElementById('welcome-message').style.display = 'block';
 
             // Show group information
-            const group = userData?.data.group_name || 'Unknown';
+            const group = userData?.data?.group_name || 'Unknown';
             const groupInfoDiv = document.getElementById('group-info');
             document.getElementById('userGroup').textContent = group;
             groupInfoDiv.classList.remove('hidden');
