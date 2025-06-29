@@ -26,7 +26,7 @@
                     sessionExpiration: 0,
                     authFlow: "redirect",
                     callback: function (response) {
-                                redirectToProxy();
+                        redirectToProxy();
                     },
                     onError: function(eventObj) {
                         alert(`Login Error: ${eventObj.errorMessage || 'An unknown error occurred.'}`);

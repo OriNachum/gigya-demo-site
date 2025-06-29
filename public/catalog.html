@@ -37,7 +37,7 @@
         window.addEventListener("message", (event) => {
             const userData = JSON.parse(sessionStorage.getItem("response"));
             console.log(JSON.stringify(userData));
-            if(userData?.data?.organization_name === undefined)
+            if(userData?.data?.organization_name == null)
             {
                 document.getElementById('show-my-org-btn').style.display = 'none';
             }
@@ -46,7 +46,16 @@
             document.getElementById('welcome-message').style.display = 'block';
 
             // Show group information
-            const group = userData?.data?.group_name || 'Unknown';
+            var group = 'Unknown';
+            if(userData?.data?.group_name != null && userData?.data?.organization_name != null)
+            {
+                group = userData?.data?.group_name+','+userData?.data?.organization_name;
+            }
+            else
+            {
+                group = userData?.data?.group_name || userData?.data?.organization_name || group;
+            }
+            
             const groupInfoDiv = document.getElementById('group-info');
             document.getElementById('userGroup').textContent = group;
             groupInfoDiv.classList.remove('hidden');

@@ -95,14 +95,13 @@
                     console.log("Context Data:", contextResponse);
                     const mappedModels = contextResponse.memberships?.mapped_models || [];
                     console.log("Mapped Models:", mappedModels);
-                    mappedModels.split(',').forEach(model => {
+                    mappedModels.forEach(model => {
                         console.log("Mapped Model:", model);
                         var groupId = getSelectedGroup(model);
                         if(groupId!== undefined)
                         {
                             console.log("Group ID for model", model, ":", groupId);
                         } else {
-                            shouldSkipGroupsSelection = false
                             // Create a dropdown for optional group IDs
                             const dropdown = document.createElement("select");
                             // Add a class to the dropdown for styling
@@ -125,6 +124,7 @@
                             });
 
                             if (dropdown.options.length > 1) {
+                                shouldSkipGroupsSelection = false
                                 // Add a label above the dropdown
                                 const label = document.createElement("label");
                                 label.classList.add("dropdown-label");
@@ -143,15 +143,6 @@
                                     selectedGroups[model] = event.target.value; // Store the selected group ID for the model
                                     console.log("Updated selected groups:", selectedGroups);
                                 });
-                                // var selectedGroupId = defaultOption.value
-                                // dropdown.addEventListener("change", (event) => {
-                                //     console.log("event:", event);
-                                //     selectedGroupId = event.target.value; // Get the selected value
-                                //     console.log("Selected Group ID:", selectedGroupId);
-                                    
-                                //    
-                                // });
-                                
                             } else {
                                 console.log("No optional group IDs found for model", model);
                             }
